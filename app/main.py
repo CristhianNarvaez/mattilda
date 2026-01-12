@@ -1,12 +1,22 @@
 from fastapi import FastAPI
 
+from app.config import get_settings
+from app.infrastructure.db.base import Base, engine
+
+settings = get_settings()
+
 
 def create_app() -> FastAPI:
     app = FastAPI(
-        title="Mattilda Backend Test",
+        title=settings.PROJECT_NAME,
         version="0.1.0",
-        description="Initial bootstrap for hexagonal FastAPI project",
+        description="Initial for FastAPI Mattilda project",
     )
+
+    # Create database tables on startup (for dev / first run)
+    @app.on_event("startup")
+    def on_startup() -> None:
+        Base.metadata.create_all(bind=engine)
 
     @app.get("/")
     def root():
