@@ -2,14 +2,14 @@ from typing import List, Optional
 
 from sqlalchemy.orm import Session
 
-from app.domain.models import student
-from app.domain.repositories import StudentRepository
+from app.domain.models.student import Student
+from app.domain.repositories.student import StudentRepository
 from app.infrastructure.db.models import StudentORM
 
 
-def _orm_to_domain(student_orm: StudentORM) -> student.Student:
+def _orm_to_domain(student_orm: StudentORM) -> Student:
     """Convert ORM object to domain model."""
-    return student.Student(
+    return Student(
         id=student_orm.id,
         first_name=student_orm.first_name,
         last_name=student_orm.last_name,
@@ -26,7 +26,7 @@ class SqlAlchemyStudentRepository(StudentRepository):
     def __init__(self, db: Session) -> None:
         self.db = db
 
-    def create(self, student: student.Student) -> student.Student:
+    def create(self, student: Student) -> Student:
         obj = StudentORM(
             first_name=student.first_name,
             last_name=student.last_name,
@@ -39,15 +39,15 @@ class SqlAlchemyStudentRepository(StudentRepository):
         self.db.refresh(obj)
         return _orm_to_domain(obj)
 
-    def get(self, student_id: int) -> Optional[student.Student]:
+    def get(self, student_id: int) -> Optional[Student]:
         obj = self.db.query(StudentORM).filter(StudentORM.id == student_id).first()
         return _orm_to_domain(obj) if obj else None
 
-    def list(self) -> List[student.Student]:
+    def list(self) -> List[Student]:
         objs = self.db.query(StudentORM).all()
         return [_orm_to_domain(o) for o in objs]
 
-    def update(self, student_id: int, student: student.Student) -> Optional[student.Student]:
+    def update(self, student_id: int, student: Student) -> Optional[Student]:
         obj = self.db.query(StudentORM).filter(StudentORM.id == student_id).first()
         if not obj:
             return None

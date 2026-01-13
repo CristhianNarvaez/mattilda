@@ -3,7 +3,7 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.domain.models import invoice
+from app.domain.models.invoice import Invoice
 from app.infrastructure.db.base import SessionLocal
 from app.infrastructure.repositories.invoice_repository_impl import (
     SqlAlchemyInvoiceRepository,
@@ -39,7 +39,7 @@ def create_invoice(
     payload: InvoiceCreate,
     service: InvoiceService = Depends(get_invoice_service),
 ):
-    invoice = invoice.Invoice(
+    invoice = Invoice(
         id=None,
         student_id=payload.student_id,
         amount=payload.amount,
@@ -72,7 +72,7 @@ def get_invoice(
     if not invoice:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="invoice.Invoice not found",
+            detail="Invoice not found",
         )
     return invoice
 
@@ -86,7 +86,7 @@ def update_invoice(
     payload: InvoiceUpdate,
     service: InvoiceService = Depends(get_invoice_service),
 ):
-    invoice = invoice.Invoice(
+    invoice = Invoice(
         id=invoice_id,
         student_id=payload.student_id,
         amount=payload.amount,
@@ -97,7 +97,7 @@ def update_invoice(
     if not updated:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="invoice.Invoice not found",
+            detail="Invoice not found",
         )
     return updated
 
@@ -114,6 +114,6 @@ def delete_invoice(
     if not deleted:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="invoice.Invoice not found",
+            detail="Invoice not found",
         )
     return None

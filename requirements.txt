@@ -3,5 +3,7 @@ uvicorn[standard]
 SQLAlchemy
 psycopg2-binary
 pydantic
+pydantic[email]
+email-validator
 pytest
 httpx

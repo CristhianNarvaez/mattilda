@@ -1,25 +1,25 @@
 from abc import ABC, abstractmethod
 from typing import List, Optional
 
-from models import student
+from app.domain.models.student import Student
 
 
 class StudentRepository(ABC):
 
     @abstractmethod
-    def create(self, student: student.Student) -> student.Student:
+    def create(self, student: Student) -> Student:
         raise NotImplementedError
 
     @abstractmethod
-    def get(self, student_id: int) -> Optional[student.Student]:
+    def get(self, student_id: int) -> Optional[Student]:
         raise NotImplementedError
 
     @abstractmethod
-    def list(self) -> List[student.Student]:
+    def list(self) -> List[Student]:
         raise NotImplementedError
 
     @abstractmethod
-    def update(self, student_id: int, student: student.Student) -> Optional[student.Student]:
+    def update(self, student_id: int, student: Student) -> Optional[Student]:
         raise NotImplementedError
 
     @abstractmethod

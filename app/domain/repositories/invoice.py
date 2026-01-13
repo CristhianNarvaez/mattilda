@@ -1,29 +1,29 @@
 from abc import ABC, abstractmethod
 from typing import List, Optional
 
-from models import invoice
+from app.domain.models.invoice import Invoice
 
 
 class InvoiceRepository(ABC):
 
     @abstractmethod
-    def create(self, invoice: invoice.Invoice) -> invoice.Invoice:
+    def create(self, invoice: Invoice) -> Invoice:
         raise NotImplementedError
 
     @abstractmethod
-    def get(self, invoice_id: int) -> Optional[invoice.Invoice]:
+    def get(self, invoice_id: int) -> Optional[Invoice]:
         raise NotImplementedError
 
     @abstractmethod
-    def list(self) -> List[invoice.Invoice]:
+    def list(self) -> List[Invoice]:
         raise NotImplementedError
 
     @abstractmethod
-    def list_by_student(self, student_id: int) -> List[invoice.Invoice]:
+    def list_by_student(self, student_id: int) -> List[Invoice]:
         raise NotImplementedError
 
     @abstractmethod
-    def update(self, invoice_id: int, invoice: invoice.Invoice) -> Optional[invoice.Invoice]:
+    def update(self, invoice_id: int, invoice: Invoice) -> Optional[Invoice]:
         raise NotImplementedError
 
     @abstractmethod

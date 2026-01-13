@@ -3,7 +3,7 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.domain.models import student
+from app.domain.models.student import Student
 from app.infrastructure.db.base import SessionLocal
 from app.infrastructure.repositories.student_repository_impl import (
     SqlAlchemyStudentRepository,
@@ -39,7 +39,7 @@ def create_student(
     payload: StudentCreate,
     service: StudentService = Depends(get_student_service),
 ):
-    student = student.Student(
+    student = Student(
         id=None,
         first_name=payload.first_name,
         last_name=payload.last_name,
@@ -73,7 +73,7 @@ def get_student(
     if not student:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="student.Student not found",
+            detail="Student not found",
         )
     return student
 
@@ -87,7 +87,7 @@ def update_student(
     payload: StudentUpdate,
     service: StudentService = Depends(get_student_service),
 ):
-    student = student.Student(
+    student = Student(
         id=student_id,
         first_name=payload.first_name,
         last_name=payload.last_name,
@@ -99,7 +99,7 @@ def update_student(
     if not updated:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="student.Student not found",
+            detail="Student not found",
         )
     return updated
 
@@ -116,6 +116,6 @@ def delete_student(
     if not deleted:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="student.Student not found",
+            detail="Student not found",
         )
     return None

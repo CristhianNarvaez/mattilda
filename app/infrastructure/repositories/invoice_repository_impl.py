@@ -2,14 +2,14 @@ from typing import List, Optional
 
 from sqlalchemy.orm import Session
 
-from app.domain.models import invoice
-from app.domain.repositories import InvoiceRepository
+from app.domain.models.invoice import Invoice
+from app.domain.repositories.invoice import InvoiceRepository
 from app.infrastructure.db.models import InvoiceORM
 
 
-def _orm_to_domain(invoice_orm: InvoiceORM) -> invoice.Invoice:
+def _orm_to_domain(invoice_orm: InvoiceORM) -> Invoice:
     """Convert ORM object to domain model."""
-    return invoice.Invoice(
+    return Invoice(
         id=invoice_orm.id,
         student_id=invoice_orm.student_id,
         amount=invoice_orm.amount,
@@ -25,7 +25,7 @@ class SqlAlchemyInvoiceRepository(InvoiceRepository):
     def __init__(self, db: Session) -> None:
         self.db = db
 
-    def create(self, invoice: invoice.Invoice) -> invoice.Invoice:
+    def create(self, invoice: Invoice) -> Invoice:
         obj = InvoiceORM(
             student_id=invoice.student_id,
             amount=invoice.amount,
@@ -37,21 +37,21 @@ class SqlAlchemyInvoiceRepository(InvoiceRepository):
         self.db.refresh(obj)
         return _orm_to_domain(obj)
 
-    def get(self, invoice_id: int) -> Optional[invoice.Invoice]:
+    def get(self, invoice_id: int) -> Optional[Invoice]:
         obj = self.db.query(InvoiceORM).filter(InvoiceORM.id == invoice_id).first()
         return _orm_to_domain(obj) if obj else None
 
-    def list(self) -> List[invoice.Invoice]:
+    def list(self) -> List[Invoice]:
         objs = self.db.query(InvoiceORM).all()
         return [_orm_to_domain(o) for o in objs]
 
-    def list_by_student(self, student_id: int) -> List[invoice.Invoice]:
+    def list_by_student(self, student_id: int) -> List[Invoice]:
         objs = (
             self.db.query(InvoiceORM).filter(InvoiceORM.student_id == student_id).all()
         )
         return [_orm_to_domain(o) for o in objs]
 
-    def update(self, invoice_id: int, invoice: invoice.Invoice) -> Optional[invoice.Invoice]:
+    def update(self, invoice_id: int, invoice: Invoice) -> Optional[Invoice]:
         obj = self.db.query(InvoiceORM).filter(InvoiceORM.id == invoice_id).first()
         if not obj:
             return None
