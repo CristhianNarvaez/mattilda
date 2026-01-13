@@ -19,6 +19,11 @@ class StudentRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
+    def list_by_school(self, school_id: int) -> List[Student]:
+        """Return all students that belong to a given school."""
+        raise NotImplementedError
+
+    @abstractmethod
     def update(self, student_id: int, student: Student) -> Optional[Student]:
         raise NotImplementedError
 

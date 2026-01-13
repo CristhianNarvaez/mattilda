@@ -41,6 +41,7 @@ def create_student(
 ):
     student = Student(
         id=None,
+        school_id=payload.school_id,
         first_name=payload.first_name,
         last_name=payload.last_name,
         email=payload.email,
@@ -89,6 +90,7 @@ def update_student(
 ):
     student = Student(
         id=student_id,
+        school_id=payload.school_id,
         first_name=payload.first_name,
         last_name=payload.last_name,
         email=payload.email,

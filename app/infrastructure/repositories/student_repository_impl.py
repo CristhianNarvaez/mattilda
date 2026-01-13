@@ -11,6 +11,7 @@ def _orm_to_domain(student_orm: StudentORM) -> Student:
     """Convert ORM object to domain model."""
     return Student(
         id=student_orm.id,
+        school_id=student_orm.school_id,
         first_name=student_orm.first_name,
         last_name=student_orm.last_name,
         email=student_orm.email,
@@ -28,6 +29,7 @@ class SqlAlchemyStudentRepository(StudentRepository):
 
     def create(self, student: Student) -> Student:
         obj = StudentORM(
+            school_id=student.school_id,
             first_name=student.first_name,
             last_name=student.last_name,
             email=student.email,
@@ -47,11 +49,20 @@ class SqlAlchemyStudentRepository(StudentRepository):
         objs = self.db.query(StudentORM).all()
         return [_orm_to_domain(o) for o in objs]
 
+    def list_by_school(self, school_id: int) -> List[Student]:
+        objs = (
+            self.db.query(StudentORM)
+            .filter(StudentORM.school_id == school_id)
+            .all()
+        )
+        return [_orm_to_domain(o) for o in objs]
+
     def update(self, student_id: int, student: Student) -> Optional[Student]:
         obj = self.db.query(StudentORM).filter(StudentORM.id == student_id).first()
         if not obj:
             return None
 
+        obj.school_id = student.school_id
         obj.first_name = student.first_name
         obj.last_name = student.last_name
         obj.email = student.email

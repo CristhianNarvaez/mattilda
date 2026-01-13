@@ -19,6 +19,9 @@ class StudentService:
     def list_students(self) -> List[Student]:
         return self.repository.list()
 
+    def list_students_by_school(self, school_id: int) -> List[Student]:
+        return self.repository.list_by_school(school_id)
+
     def update_student(self, student_id: int, student: Student) -> Optional[Student]:
         return self.repository.update(student_id, student)
 

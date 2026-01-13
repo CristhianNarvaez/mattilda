@@ -6,6 +6,7 @@ from typing import Optional
 @dataclass
 class Student:
     id: Optional[int]
+    school_id: int
     first_name: str
     last_name: str
     email: str
