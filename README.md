@@ -2,7 +2,7 @@
 
 ## Build containers
 ```
-docker-compose --build
+docker-compose build
 ```
 
 ## Run containers
