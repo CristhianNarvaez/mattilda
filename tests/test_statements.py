@@ -1,8 +1,12 @@
+import uuid
+import random
+
+
 def _create_school_student_and_invoices(client):
     # Create school
     school_payload = {
         "name": "Statement School",
-        "tax_id": "111222333",
+        "tax_id": str(uuid.uuid4()),
         "address": "Statement St 1",
         "is_active": True,
     }
@@ -15,7 +19,7 @@ def _create_school_student_and_invoices(client):
         "school_id": school["id"],
         "first_name": "Statement",
         "last_name": "Student",
-        "email": "statement.student@example.com",
+        "email": "statement" + str(random.randint(1, 100)) + ".student@example.com",
         "grade": "9A",
         "is_active": True,
     }

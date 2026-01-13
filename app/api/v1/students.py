@@ -7,10 +7,13 @@ from app.domain.models.student import Student
 from app.infrastructure.db.base import SessionLocal
 from app.infrastructure.repositories.student_repository_impl import (
     SqlAlchemyStudentRepository,
+)
+from app.infrastructure.repositories.invoice_repository_impl import (
     SqlAlchemyInvoiceRepository,
 )
 from app.schemas.student import StudentCreate, StudentRead, StudentUpdate
 from app.services.invoice_service import InvoiceService
+from app.schemas.invoice import InvoiceRead
 from app.services.student_service import StudentService
 from app.schemas.statement import StudentStatement
 
@@ -134,7 +137,6 @@ def get_student_statement(
     student_id: int,
     db: Session = Depends(get_db),
 ):
-    # Reusamos el mismo Session para ambos repos
     student_repo = SqlAlchemyStudentRepository(db)
     invoice_repo = SqlAlchemyInvoiceRepository(db)
 
@@ -154,11 +156,13 @@ def get_student_statement(
     total_paid = sum(inv.amount for inv in invoices if inv.paid)
     total_pending = total_invoiced - total_paid
 
+    invoice_read_list = [InvoiceRead.model_validate(inv) for inv in invoices]
+
     return StudentStatement(
         student_id=student.id,
         school_id=student.school_id,
         total_invoiced=total_invoiced,
         total_paid=total_paid,
         total_pending=total_pending,
-        invoices=invoices,
+        invoices=invoice_read_list,
     )

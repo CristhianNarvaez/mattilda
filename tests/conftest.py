@@ -1,4 +1,5 @@
 import pytest
+import uuid
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -55,7 +56,7 @@ def client():
 def school(client):
     payload = {
         "name": "Test School",
-        "tax_id": "123456789",
+        "tax_id": str(uuid.uuid4()),
         "address": "Fake Street 123",
         "is_active": True,
     }

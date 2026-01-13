@@ -15,6 +15,7 @@ from app.infrastructure.repositories.school_repository_impl import (
     SqlAlchemySchoolRepository,
 )
 from app.schemas.school import SchoolCreate, SchoolRead, SchoolUpdate
+from app.schemas.invoice import InvoiceRead
 from app.services.school_service import SchoolService
 from app.services.student_service import StudentService
 from app.services.invoice_service import InvoiceService
@@ -162,11 +163,13 @@ def get_school_statement(
     total_paid = sum(inv.amount for inv in all_invoices if inv.paid)
     total_pending = total_invoiced - total_paid
 
+    invoice_read_list = [InvoiceRead.model_validate(inv) for inv in all_invoices]
+
     return SchoolStatement(
         school_id=school.id,
         total_students=len(students),
         total_invoiced=total_invoiced,
         total_paid=total_paid,
         total_pending=total_pending,
-        invoices=all_invoices,
+        invoices=invoice_read_list,
     )

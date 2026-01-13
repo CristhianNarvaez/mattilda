@@ -1,6 +1,6 @@
 from datetime import date, datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class InvoiceBase(BaseModel):
@@ -23,10 +23,7 @@ class InvoiceUpdate(InvoiceBase):
 
 
 class InvoiceRead(InvoiceBase):
-    """Representation of an invoice returned by the API."""
-
     id: int
     issued_at: datetime
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
