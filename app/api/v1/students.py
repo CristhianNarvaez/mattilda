@@ -7,9 +7,12 @@ from app.domain.models.student import Student
 from app.infrastructure.db.base import SessionLocal
 from app.infrastructure.repositories.student_repository_impl import (
     SqlAlchemyStudentRepository,
+    SqlAlchemyInvoiceRepository,
 )
 from app.schemas.student import StudentCreate, StudentRead, StudentUpdate
+from app.services.invoice_service import InvoiceService
 from app.services.student_service import StudentService
+from app.schemas.statement import StudentStatement
 
 router = APIRouter(
     prefix="/students",
@@ -121,3 +124,41 @@ def delete_student(
             detail="Student not found",
         )
     return None
+
+
+@router.get(
+    "/{student_id}/statement",
+    response_model=StudentStatement,
+)
+def get_student_statement(
+    student_id: int,
+    db: Session = Depends(get_db),
+):
+    # Reusamos el mismo Session para ambos repos
+    student_repo = SqlAlchemyStudentRepository(db)
+    invoice_repo = SqlAlchemyInvoiceRepository(db)
+
+    student_service = StudentService(student_repo)
+    invoice_service = InvoiceService(invoice_repo)
+
+    student = student_service.get_student(student_id)
+    if not student:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Student not found",
+        )
+
+    invoices = invoice_service.list_invoices_by_student(student_id)
+
+    total_invoiced = sum(inv.amount for inv in invoices)
+    total_paid = sum(inv.amount for inv in invoices if inv.paid)
+    total_pending = total_invoiced - total_paid
+
+    return StudentStatement(
+        student_id=student.id,
+        school_id=student.school_id,
+        total_invoiced=total_invoiced,
+        total_paid=total_paid,
+        total_pending=total_pending,
+        invoices=invoices,
+    )

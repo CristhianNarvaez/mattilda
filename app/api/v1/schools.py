@@ -5,11 +5,20 @@ from sqlalchemy.orm import Session
 
 from app.domain.models.school import School
 from app.infrastructure.db.base import SessionLocal
+from app.infrastructure.repositories.student_repository_impl import (
+    SqlAlchemyStudentRepository,
+)
+from app.infrastructure.repositories.invoice_repository_impl import (
+    SqlAlchemyInvoiceRepository,
+)
 from app.infrastructure.repositories.school_repository_impl import (
     SqlAlchemySchoolRepository,
 )
 from app.schemas.school import SchoolCreate, SchoolRead, SchoolUpdate
 from app.services.school_service import SchoolService
+from app.services.student_service import StudentService
+from app.services.invoice_service import InvoiceService
+from app.schemas.statement import SchoolStatement
 
 router = APIRouter(
     prefix="/schools",
@@ -117,3 +126,47 @@ def delete_school(
             detail="School not found",
         )
     return None
+
+
+@router.get(
+    "/{school_id}/statement",
+    response_model=SchoolStatement,
+)
+def get_school_statement(
+    school_id: int,
+    db: Session = Depends(get_db),
+):
+    school_repo = SqlAlchemySchoolRepository(db)
+    student_repo = SqlAlchemyStudentRepository(db)
+    invoice_repo = SqlAlchemyInvoiceRepository(db)
+
+    school_service = SchoolService(school_repo)
+    student_service = StudentService(student_repo)
+    invoice_service = InvoiceService(invoice_repo)
+
+    school = school_service.get_school(school_id)
+    if not school:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="School not found",
+        )
+
+    students = student_service.list_students_by_school(school_id)
+
+    all_invoices = []
+    for student in students:
+        student_invoices = invoice_service.list_invoices_by_student(student.id)
+        all_invoices.extend(student_invoices)
+
+    total_invoiced = sum(inv.amount for inv in all_invoices)
+    total_paid = sum(inv.amount for inv in all_invoices if inv.paid)
+    total_pending = total_invoiced - total_paid
+
+    return SchoolStatement(
+        school_id=school.id,
+        total_students=len(students),
+        total_invoiced=total_invoiced,
+        total_paid=total_paid,
+        total_pending=total_pending,
+        invoices=all_invoices,
+    )
